@@ -1,0 +1,4 @@
+module.exports = {
+  repository: 'username/repository',
+  travis_token: 'YOUR_TRAVIS_CI_TOKEN'
+};

@@ -1,0 +1,23 @@
+{
+  "name": "travis-webhook",
+  "version": "1.0.0",
+  "description": "Travis CI webhook to validate request and run commands",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bkbooth/travis-webhook.git"
+  },
+  "keywords": [
+    "Travis",
+    "CI",
+    "webhook"
+  ],
+  "author": "Ben Booth <bkbooth@gmail.com>",
+  "license": "ISC",
+  "homepage": "https://github.com/bkbooth/travis-webhook"
+}
