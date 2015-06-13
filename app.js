@@ -18,7 +18,7 @@ router.post('/', function(req, res, next) {
   }
   console.log('valid reqest');
   console.log(req.body);
-  return res.status(201).json({});
+  return res.status(204).json({});
 });
 
 function validRequest(authorize, repoSlug, travisToken) {
