@@ -13,11 +13,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var router = express.Router();
 router.post('/', function(req, res, next) {
   if (!validRequest(req.get('Authorization'), config.repository, config.travis_token)) {
-    console.log('invalid request', req.get('Authorization'), config.repository, config.travis_token);
     return res.status(401).json({ code: 401, message: 'Invalid Authorization header' });
   }
-  console.log('valid reqest');
-  console.log(req.body);
+
+  try {
+    var payload = JSON.parse(req.body.payload);
+  } catch(error) {
+    console.log('Failed parsing JSON. ' + error.message);
+    return res.status(400).json({ code: 400, message: 'Failed parsing JSON.' });
+  }
+
+  if (payload.status === 0 && payload.branch === 'master') {
+    console.log('Let\'s do something crazy, like pulling the latest version...');
+  } else {
+    console.log(payload);
+  }
+
   return res.status(204).json({});
 });
 
