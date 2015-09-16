@@ -40,7 +40,7 @@ _.each(config.hooks, function(hook) {
     if (payload.status !== 0 || branches.indexOf(payload.branch) === -1) {
       // Build failed or invalid branch, return with no effect
       info('Build failed or invalid branch, exiting');
-      res.status(204).send();
+      return res.status(204).send();
     }
 
     // Get actions from hook or use defaults
