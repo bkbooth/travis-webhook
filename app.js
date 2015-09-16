@@ -3,10 +3,13 @@ var config = require('./config'),
     app = express(),
     logger = require('morgan'),
     bodyParser = require('body-parser'),
-    debug = require('debug')('hook:router'),
     _ = require('lodash'),
     async = require('async'),
     exec = require('child_process').exec;
+
+var error = require('debug')('hook:error');
+var info = require('debug')('hook:info');
+info.log = console.info.bind(console);
 
 var HttpError = require('./utils').HttpError,
     validateRequestAuth = require('./utils').validateRequestAuth;
@@ -20,7 +23,7 @@ var router = express.Router();
 _.each(config.hooks, function(hook) {
   router.post('/' + hook.repository, function(req, res, next) {
     if (!validateRequestAuth(req.get('Authorization'), hook.repository, hook.travis_token)) {
-      debug('Invalid Authorization header');
+      error('Invalid Authorization header');
       return next(new HttpError('Invalid Authorization header', 401));
     }
 
@@ -28,7 +31,7 @@ _.each(config.hooks, function(hook) {
     try {
       var payload = JSON.parse(req.body.payload);
     } catch (err) {
-      debug('Failed parsing JSON');
+      error('Failed parsing JSON');
       return next(new HttpError(err.message || 'Failed parsing JSON', 400));
     }
 
@@ -36,7 +39,7 @@ _.each(config.hooks, function(hook) {
     var branches = _.has(hook, 'branches') && _.isArray(hook.branches) ? hook.branches : ['master'];
     if (payload.status !== 0 || branches.indexOf(payload.branch) === -1) {
       // Build failed or invalid branch, return with no effect
-      debug('Build failed or invalid branch, exiting');
+      info('Build failed or invalid branch, exiting');
       res.status(204).send();
     }
 
@@ -50,7 +53,7 @@ _.each(config.hooks, function(hook) {
     async.series(
       _.map(actions, function(action) {
         return function(done) {
-          debug('Running action \'' + action + '\' in ' + hook.path);
+          info('Running action \'' + action + '\' in ' + hook.path);
           exec(action, { cwd: hook.path }, function(err) {
             if (err) { return done(err); }
 
@@ -60,12 +63,12 @@ _.each(config.hooks, function(hook) {
       }),
       function(err) {
         if (err) {
-          debug('Failed running actions. ' + err.message);
+          error('Failed running actions. ' + err.message);
           return next(new HttpError(err.message || 'Failed running actions', 400));
         }
 
         // All actions completed
-        debug('All actions completed');
+        info('All actions completed');
         res.status(204).send();
       }
     );
