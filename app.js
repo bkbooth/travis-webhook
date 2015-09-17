@@ -35,9 +35,9 @@ _.each(config.hooks, function(hook) {
       return next(new HttpError(err.message || 'Failed parsing JSON', 400));
     }
 
-    // Did the build pass and do we care about this branch?
+    // Did the build pass, is it a push and do we care about this branch?
     var branches = _.has(hook, 'branches') && _.isArray(hook.branches) ? hook.branches : ['master'];
-    if (payload.status !== 0 || branches.indexOf(payload.branch) === -1) {
+    if (payload.status !== 0 || payload.type !== 'push' || branches.indexOf(payload.branch) === -1) {
       // Build failed or invalid branch, return with no effect
       info('Build failed or invalid branch, exiting');
       return res.status(204).send();
